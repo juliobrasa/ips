@@ -105,6 +105,39 @@
                         <span class="material-icons-outlined mr-3">analytics</span>
                         Revenue Report
                     </a>
+
+                    <!-- Security & Tools Section -->
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Security & Tools
+                    </div>
+
+                    <a href="{{ route('admin.security.index') }}"
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.index') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                        <span class="material-icons-outlined mr-3">security</span>
+                        Security Dashboard
+                        @php $openReports = \App\Models\AbuseReport::where('status', 'open')->count(); @endphp
+                        @if($openReports > 0)
+                        <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $openReports }}</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('admin.security.blocklist-check') }}"
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.blocklist-check') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                        <span class="material-icons-outlined mr-3">manage_search</span>
+                        Blocklist Checker
+                    </a>
+
+                    <a href="{{ route('admin.security.abuse-reports') }}"
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.abuse-reports*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                        <span class="material-icons-outlined mr-3">flag</span>
+                        Abuse Reports
+                    </a>
+
+                    <a href="{{ route('admin.documents.index') }}"
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.documents.*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
+                        <span class="material-icons-outlined mr-3">description</span>
+                        Document Templates
+                    </a>
                 </div>
 
                 <!-- Divider -->

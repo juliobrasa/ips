@@ -144,6 +144,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/finance/payouts/{payout}/process', [App\Http\Controllers\Admin\FinanceController::class, 'processPayout'])->name('finance.payouts.process');
     Route::post('/finance/payouts/{payout}/complete', [App\Http\Controllers\Admin\FinanceController::class, 'completePayout'])->name('finance.payouts.complete');
     Route::get('/finance/revenue', [App\Http\Controllers\Admin\FinanceController::class, 'revenueReport'])->name('finance.revenue');
+
+    // Document Templates
+    Route::get('/documents', [App\Http\Controllers\Admin\DocumentTemplateController::class, 'index'])->name('documents.index');
+    Route::get('/documents/{template}/preview', [App\Http\Controllers\Admin\DocumentTemplateController::class, 'preview'])->name('documents.preview');
+    Route::get('/documents/{template}/download', [App\Http\Controllers\Admin\DocumentTemplateController::class, 'download'])->name('documents.download');
+
+    // Security & IP Reputation
+    Route::get('/security', [App\Http\Controllers\Admin\SecurityController::class, 'index'])->name('security.index');
+    Route::get('/security/blocklist-check', [App\Http\Controllers\Admin\SecurityController::class, 'blocklistCheck'])->name('security.blocklist-check');
+    Route::post('/security/check-ip', [App\Http\Controllers\Admin\SecurityController::class, 'checkIp'])->name('security.check-ip');
+    Route::post('/security/check-subnet', [App\Http\Controllers\Admin\SecurityController::class, 'checkSubnet'])->name('security.check-subnet');
+    Route::get('/security/abuse-reports', [App\Http\Controllers\Admin\SecurityController::class, 'abuseReports'])->name('security.abuse-reports');
+    Route::get('/security/abuse-reports/{report}', [App\Http\Controllers\Admin\SecurityController::class, 'showAbuseReport'])->name('security.abuse-reports.show');
+    Route::post('/security/abuse-reports/{report}/resolve', [App\Http\Controllers\Admin\SecurityController::class, 'resolveAbuseReport'])->name('security.abuse-reports.resolve');
+    Route::post('/security/abuse-reports/{report}/dismiss', [App\Http\Controllers\Admin\SecurityController::class, 'dismissAbuseReport'])->name('security.abuse-reports.dismiss');
 });
 
 require __DIR__.'/auth.php';

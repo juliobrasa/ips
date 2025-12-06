@@ -1,5 +1,6 @@
 <x-guest-layout>
-    <x-slot name="title">{{ __('Help Center') }}</x-slot>
+    <x-slot name="title">Help Center - IPv4 Leasing Guides & Tutorials | Soltia IPS</x-slot>
+    <x-slot name="metaDescription">{{ __('Comprehensive guides and tutorials for IPv4 address leasing. Learn about LOA, RPKI, IP reputation, KYC verification, and more.') }}</x-slot>
 
     <!-- Hero Section -->
     <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
@@ -13,32 +14,37 @@
         </div>
     </div>
 
-    <!-- Guides Grid -->
+    <!-- Guides by Category -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 class="text-2xl font-bold text-gray-800 mb-8">{{ __('Getting Started Guides') }}</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            @foreach($guides as $guide)
-            <a href="{{ route('help.show', $guide['slug']) }}"
-               class="bg-white rounded-xl shadow-material-1 p-8 hover:shadow-material-2 transition-shadow group">
-                <div class="flex items-start">
-                    <div class="w-14 h-14 bg-{{ $guide['color'] }}-100 rounded-xl flex items-center justify-center mr-5 group-hover:bg-{{ $guide['color'] }}-200 transition-colors">
-                        <span class="material-icons-outlined text-{{ $guide['color'] }}-600 text-2xl">{{ $guide['icon'] }}</span>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2 group-hover:text-{{ $guide['color'] }}-600 transition-colors">
-                            {{ $guide['title'] }}
-                        </h3>
-                        <p class="text-gray-600">{{ $guide['description'] }}</p>
-                        <div class="mt-4 flex items-center text-{{ $guide['color'] }}-600 font-medium">
-                            {{ __('Read Guide') }}
-                            <span class="material-icons-outlined ml-1 text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                        </div>
-                    </div>
+        @foreach($categories as $catKey => $category)
+            @if(count($category['guides']) > 0)
+            <div class="mb-12">
+                <div class="flex items-center mb-6">
+                    <span class="material-icons-outlined text-primary-600 mr-3">{{ $category['icon'] }}</span>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ $category['title'] }}</h2>
                 </div>
-            </a>
-            @endforeach
-        </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($category['guides'] as $guide)
+                    <a href="{{ route('help.show', $guide['slug']) }}"
+                       class="bg-white rounded-xl shadow-material-1 p-6 hover:shadow-material-2 transition-shadow group">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-{{ $guide['color'] }}-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-{{ $guide['color'] }}-200 transition-colors flex-shrink-0">
+                                <span class="material-icons-outlined text-{{ $guide['color'] }}-600 text-xl">{{ $guide['icon'] }}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-1 group-hover:text-{{ $guide['color'] }}-600 transition-colors">
+                                    {{ $guide['title'] }}
+                                </h3>
+                                <p class="text-gray-600 text-sm line-clamp-2">{{ $guide['description'] }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        @endforeach
 
         <!-- FAQ Section -->
         <div class="mt-16">
