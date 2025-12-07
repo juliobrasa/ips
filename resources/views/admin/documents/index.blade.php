@@ -1,14 +1,14 @@
 <x-admin-layout>
-    <x-slot name="header">Document Templates</x-slot>
-    <x-slot name="title">Document Templates</x-slot>
+    <x-slot name="header">{{ __('Document Templates') }}</x-slot>
+    <x-slot name="title">{{ __('Document Templates') }}</x-slot>
 
     <div class="space-y-6">
         <!-- Header -->
         <div class="bg-white rounded-xl shadow-material-1 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-900">Legal Document Templates</h2>
-                    <p class="text-gray-600 mt-1">Manage and customize document templates for KYC, LOA, contracts, and agreements.</p>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ __('Legal Document Templates') }}</h2>
+                    <p class="text-gray-600 mt-1">{{ __('Manage and customize document templates for KYC, LOA, contracts, and agreements.') }}</p>
                 </div>
                 <span class="material-icons-outlined text-5xl text-primary-200">description</span>
             </div>
@@ -54,12 +54,12 @@
                         <a href="{{ route('admin.documents.preview', $key) }}" target="_blank"
                            class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
                             <span class="material-icons-outlined text-sm mr-1">visibility</span>
-                            Preview
+                            {{ __('Preview') }}
                         </a>
                         <a href="{{ route('admin.documents.download', $key) }}"
                            class="flex-1 inline-flex items-center justify-center px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm">
                             <span class="material-icons-outlined text-sm mr-1">download</span>
-                            Download
+                            {{ __('Download') }}
                         </a>
                     </div>
                 </div>
@@ -69,12 +69,12 @@
 
         <!-- Template Variables Reference -->
         <div class="bg-white rounded-xl shadow-material-1 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Variables Reference</h3>
-            <p class="text-gray-600 mb-4">These variables are automatically replaced when generating documents:</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('Template Variables Reference') }}</h3>
+            <p class="text-gray-600 mb-4">{{ __('These variables are automatically replaced when generating documents:') }}</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Company Information</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Company Information') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{company_name}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{legal_name}}</code></li>
@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Contact Information</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Contact Information') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{contact_name}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{contact_email}}</code></li>
@@ -94,7 +94,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Subnet Information</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Subnet Information') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{subnet}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{ip_count}}</code></li>
@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Lease Information</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Lease Information') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{start_date}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{end_date}}</code></li>
@@ -113,7 +113,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Document References</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Document References') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{loa_number}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{contract_number}}</code></li>
@@ -122,7 +122,7 @@
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-medium text-gray-900 mb-2">Platform Settings</h4>
+                    <h4 class="font-medium text-gray-900 mb-2">{{ __('Platform Settings') }}</h4>
                     <ul class="text-sm text-gray-600 space-y-1">
                         <li><code class="bg-gray-200 px-1 rounded">@{{platform_fee}}</code></li>
                         <li><code class="bg-gray-200 px-1 rounded">@{{minimum_payout}}</code></li>

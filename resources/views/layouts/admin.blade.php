@@ -33,12 +33,20 @@
             <div class="flex items-center justify-center h-16 bg-gray-800">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
                     <span class="material-icons-outlined text-3xl text-primary-400">admin_panel_settings</span>
-                    <span class="text-xl font-bold">Admin Panel</span>
+                    <span class="text-xl font-bold">{{ __('Admin Panel') }}</span>
                 </a>
             </div>
 
+            <!-- Language Switcher -->
+            <div class="px-4 py-2 bg-gray-800 border-t border-gray-700">
+                <div class="flex items-center justify-center space-x-2">
+                    <a href="{{ route('language.switch', 'en') }}" class="px-2 py-1 text-xs rounded {{ app()->getLocale() === 'en' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white' }}">EN</a>
+                    <a href="{{ route('language.switch', 'es') }}" class="px-2 py-1 text-xs rounded {{ app()->getLocale() === 'es' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white' }}">ES</a>
+                </div>
+            </div>
+
             <!-- Navigation -->
-            <nav class="mt-6 px-3">
+            <nav class="mt-4 px-3">
                 <div class="space-y-1">
                     <!-- Dashboard -->
                     <a href="{{ route('admin.dashboard') }}"
@@ -58,7 +66,7 @@
                     <a href="{{ route('admin.kyc.index') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.kyc.*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">verified_user</span>
-                        KYC Management
+                        {{ __('KYC Management') }}
                         @php $pendingKyc = \App\Models\Company::whereIn('kyc_status', ['pending', 'in_review'])->count(); @endphp
                         @if($pendingKyc > 0)
                         <span class="ml-auto bg-warning-500 text-white text-xs px-2 py-1 rounded-full">{{ $pendingKyc }}</span>
@@ -69,31 +77,31 @@
                     <a href="{{ route('admin.subnets.index') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.subnets.*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">lan</span>
-                        Subnets
+                        {{ __('Subnets') }}
                     </a>
 
                     <!-- Lease Management -->
                     <a href="{{ route('admin.leases.index') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.leases.*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">assignment</span>
-                        Leases
+                        {{ __('Leases') }}
                     </a>
 
                     <!-- Finance Section -->
                     <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Finance
+                        {{ __('Finance') }}
                     </div>
 
                     <a href="{{ route('admin.finance.invoices') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.finance.invoices') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">receipt_long</span>
-                        Invoices
+                        {{ __('Invoices') }}
                     </a>
 
                     <a href="{{ route('admin.finance.payouts') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.finance.payouts*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">payments</span>
-                        Payouts
+                        {{ __('Payouts') }}
                         @php $pendingPayouts = \App\Models\Payout::where('status', 'pending')->count(); @endphp
                         @if($pendingPayouts > 0)
                         <span class="ml-auto bg-primary-500 text-white text-xs px-2 py-1 rounded-full">{{ $pendingPayouts }}</span>
@@ -103,18 +111,18 @@
                     <a href="{{ route('admin.finance.revenue') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.finance.revenue') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">analytics</span>
-                        Revenue Report
+                        {{ __('Revenue Report') }}
                     </a>
 
                     <!-- Security & Tools Section -->
                     <div class="pt-4 pb-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        Security & Tools
+                        {{ __('Security & Tools') }}
                     </div>
 
                     <a href="{{ route('admin.security.index') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.index') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">security</span>
-                        Security Dashboard
+                        {{ __('Security Dashboard') }}
                         @php $openReports = \App\Models\AbuseReport::where('status', 'open')->count(); @endphp
                         @if($openReports > 0)
                         <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $openReports }}</span>
@@ -124,19 +132,19 @@
                     <a href="{{ route('admin.security.blocklist-check') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.blocklist-check') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">manage_search</span>
-                        Blocklist Checker
+                        {{ __('Blocklist Checker') }}
                     </a>
 
                     <a href="{{ route('admin.security.abuse-reports') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.security.abuse-reports*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">flag</span>
-                        Abuse Reports
+                        {{ __('Abuse Reports') }}
                     </a>
 
                     <a href="{{ route('admin.documents.index') }}"
                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.documents.*') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700' }}">
                         <span class="material-icons-outlined mr-3">description</span>
-                        Document Templates
+                        {{ __('Document Templates') }}
                     </a>
                 </div>
 
@@ -147,7 +155,7 @@
                 <a href="{{ route('dashboard') }}"
                    class="flex items-center px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-700">
                     <span class="material-icons-outlined mr-3">arrow_back</span>
-                    Back to App
+                    {{ __('Back to App') }}
                 </a>
             </nav>
 
@@ -159,7 +167,7 @@
                     </div>
                     <div class="ml-3 flex-1">
                         <p class="text-sm font-medium">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-400">Administrator</p>
+                        <p class="text-xs text-gray-400">{{ __('Administrator') }}</p>
                     </div>
                 </div>
             </div>
@@ -179,14 +187,14 @@
                     @isset($header)
                         {{ $header }}
                     @else
-                        Admin Dashboard
+                        {{ __('Admin Dashboard') }}
                     @endisset
                 </h1>
 
                 <!-- Right Side -->
                 <div class="flex items-center space-x-4">
                     <span class="px-3 py-1 text-xs font-medium bg-danger-100 text-danger-700 rounded-full">
-                        Admin Mode
+                        {{ __('Admin Mode') }}
                     </span>
                 </div>
             </header>

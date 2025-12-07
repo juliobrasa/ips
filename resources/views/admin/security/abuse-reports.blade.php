@@ -1,6 +1,30 @@
 <x-admin-layout>
-    <x-slot name="header">Abuse Reports</x-slot>
-    <x-slot name="title">Abuse Reports Management</x-slot>
+    <x-slot name="header">{{ __('Abuse Reports') }}</x-slot>
+    <x-slot name="title">{{ __('Abuse Reports Management') }}</x-slot>
+
+    @php
+        $statusTranslations = [
+            'open' => __('Open'),
+            'investigating' => __('Investigating'),
+            'resolved' => __('Resolved'),
+            'dismissed' => __('Dismissed'),
+        ];
+        $severityTranslations = [
+            'critical' => __('Critical'),
+            'high' => __('High'),
+            'medium' => __('Medium'),
+            'low' => __('Low'),
+        ];
+        $typeTranslations = [
+            'spam' => __('Spam'),
+            'phishing' => __('Phishing'),
+            'malware' => __('Malware'),
+            'ddos' => __('DDoS'),
+            'scraping' => __('Scraping'),
+            'fraud' => __('Fraud'),
+            'other' => __('Other'),
+        ];
+    @endphp
 
     <!-- Stats Bar -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -8,7 +32,7 @@
            class="bg-white rounded-xl p-4 shadow-material-1 hover:shadow-material-2 transition-shadow {{ request('status') === 'open' ? 'ring-2 ring-red-500' : '' }}">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase">Open</p>
+                    <p class="text-xs text-gray-500 uppercase">{{ __('Open') }}</p>
                     <p class="text-2xl font-bold text-red-600">{{ $stats['open'] }}</p>
                 </div>
                 <span class="material-icons-outlined text-red-400">error_outline</span>
@@ -18,7 +42,7 @@
            class="bg-white rounded-xl p-4 shadow-material-1 hover:shadow-material-2 transition-shadow {{ request('status') === 'investigating' ? 'ring-2 ring-yellow-500' : '' }}">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase">Investigating</p>
+                    <p class="text-xs text-gray-500 uppercase">{{ __('Investigating') }}</p>
                     <p class="text-2xl font-bold text-yellow-600">{{ $stats['investigating'] }}</p>
                 </div>
                 <span class="material-icons-outlined text-yellow-400">search</span>
@@ -28,7 +52,7 @@
            class="bg-white rounded-xl p-4 shadow-material-1 hover:shadow-material-2 transition-shadow {{ request('status') === 'resolved' ? 'ring-2 ring-green-500' : '' }}">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase">Resolved</p>
+                    <p class="text-xs text-gray-500 uppercase">{{ __('Resolved') }}</p>
                     <p class="text-2xl font-bold text-green-600">{{ $stats['resolved'] }}</p>
                 </div>
                 <span class="material-icons-outlined text-green-400">check_circle</span>
@@ -38,7 +62,7 @@
            class="bg-white rounded-xl p-4 shadow-material-1 hover:shadow-material-2 transition-shadow {{ request('status') === 'dismissed' ? 'ring-2 ring-gray-500' : '' }}">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase">Dismissed</p>
+                    <p class="text-xs text-gray-500 uppercase">{{ __('Dismissed') }}</p>
                     <p class="text-2xl font-bold text-gray-600">{{ $stats['dismissed'] }}</p>
                 </div>
                 <span class="material-icons-outlined text-gray-400">cancel</span>
@@ -50,45 +74,45 @@
     <div class="bg-white rounded-xl p-4 shadow-material-1 mb-6">
         <form method="GET" action="{{ route('admin.security.abuse-reports') }}" class="flex flex-wrap items-center gap-4">
             <div class="flex-1 min-w-[150px]">
-                <label for="status" class="block text-xs text-gray-500 mb-1">Status</label>
+                <label for="status" class="block text-xs text-gray-500 mb-1">{{ __('Status') }}</label>
                 <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                    <option value="all">All Status</option>
-                    <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>Open</option>
-                    <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>Investigating</option>
-                    <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
-                    <option value="dismissed" {{ request('status') === 'dismissed' ? 'selected' : '' }}>Dismissed</option>
+                    <option value="all">{{ __('All Status') }}</option>
+                    <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>{{ __('Open') }}</option>
+                    <option value="investigating" {{ request('status') === 'investigating' ? 'selected' : '' }}>{{ __('Investigating') }}</option>
+                    <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>{{ __('Resolved') }}</option>
+                    <option value="dismissed" {{ request('status') === 'dismissed' ? 'selected' : '' }}>{{ __('Dismissed') }}</option>
                 </select>
             </div>
             <div class="flex-1 min-w-[150px]">
-                <label for="severity" class="block text-xs text-gray-500 mb-1">Severity</label>
+                <label for="severity" class="block text-xs text-gray-500 mb-1">{{ __('Severity') }}</label>
                 <select name="severity" id="severity" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                    <option value="all">All Severity</option>
-                    <option value="critical" {{ request('severity') === 'critical' ? 'selected' : '' }}>Critical</option>
-                    <option value="high" {{ request('severity') === 'high' ? 'selected' : '' }}>High</option>
-                    <option value="medium" {{ request('severity') === 'medium' ? 'selected' : '' }}>Medium</option>
-                    <option value="low" {{ request('severity') === 'low' ? 'selected' : '' }}>Low</option>
+                    <option value="all">{{ __('All Severity') }}</option>
+                    <option value="critical" {{ request('severity') === 'critical' ? 'selected' : '' }}>{{ __('Critical') }}</option>
+                    <option value="high" {{ request('severity') === 'high' ? 'selected' : '' }}>{{ __('High') }}</option>
+                    <option value="medium" {{ request('severity') === 'medium' ? 'selected' : '' }}>{{ __('Medium') }}</option>
+                    <option value="low" {{ request('severity') === 'low' ? 'selected' : '' }}>{{ __('Low') }}</option>
                 </select>
             </div>
             <div class="flex-1 min-w-[150px]">
-                <label for="type" class="block text-xs text-gray-500 mb-1">Type</label>
+                <label for="type" class="block text-xs text-gray-500 mb-1">{{ __('Type') }}</label>
                 <select name="type" id="type" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                    <option value="all">All Types</option>
-                    <option value="spam" {{ request('type') === 'spam' ? 'selected' : '' }}>Spam</option>
-                    <option value="phishing" {{ request('type') === 'phishing' ? 'selected' : '' }}>Phishing</option>
-                    <option value="malware" {{ request('type') === 'malware' ? 'selected' : '' }}>Malware</option>
-                    <option value="ddos" {{ request('type') === 'ddos' ? 'selected' : '' }}>DDoS</option>
-                    <option value="scraping" {{ request('type') === 'scraping' ? 'selected' : '' }}>Scraping</option>
-                    <option value="fraud" {{ request('type') === 'fraud' ? 'selected' : '' }}>Fraud</option>
-                    <option value="other" {{ request('type') === 'other' ? 'selected' : '' }}>Other</option>
+                    <option value="all">{{ __('All Types') }}</option>
+                    <option value="spam" {{ request('type') === 'spam' ? 'selected' : '' }}>{{ __('Spam') }}</option>
+                    <option value="phishing" {{ request('type') === 'phishing' ? 'selected' : '' }}>{{ __('Phishing') }}</option>
+                    <option value="malware" {{ request('type') === 'malware' ? 'selected' : '' }}>{{ __('Malware') }}</option>
+                    <option value="ddos" {{ request('type') === 'ddos' ? 'selected' : '' }}>{{ __('DDoS') }}</option>
+                    <option value="scraping" {{ request('type') === 'scraping' ? 'selected' : '' }}>{{ __('Scraping') }}</option>
+                    <option value="fraud" {{ request('type') === 'fraud' ? 'selected' : '' }}>{{ __('Fraud') }}</option>
+                    <option value="other" {{ request('type') === 'other' ? 'selected' : '' }}>{{ __('Other') }}</option>
                 </select>
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
                     <span class="material-icons-outlined text-sm">filter_list</span>
-                    Filter
+                    {{ __('Filter') }}
                 </button>
                 <a href="{{ route('admin.security.abuse-reports') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                    Clear
+                    {{ __('Clear') }}
                 </a>
             </div>
         </form>
@@ -100,14 +124,14 @@
             <table class="w-full">
                 <thead class="bg-gray-50">
                     <tr class="text-left text-xs text-gray-500 uppercase tracking-wider">
-                        <th class="px-6 py-3">ID</th>
-                        <th class="px-6 py-3">Type</th>
-                        <th class="px-6 py-3">Subnet</th>
-                        <th class="px-6 py-3">Source</th>
-                        <th class="px-6 py-3">Severity</th>
-                        <th class="px-6 py-3">Status</th>
-                        <th class="px-6 py-3">Reported</th>
-                        <th class="px-6 py-3">Actions</th>
+                        <th class="px-6 py-3">{{ __('ID') }}</th>
+                        <th class="px-6 py-3">{{ __('Type') }}</th>
+                        <th class="px-6 py-3">{{ __('Subnet') }}</th>
+                        <th class="px-6 py-3">{{ __('Source') }}</th>
+                        <th class="px-6 py-3">{{ __('Severity') }}</th>
+                        <th class="px-6 py-3">{{ __('Status') }}</th>
+                        <th class="px-6 py-3">{{ __('Reported') }}</th>
+                        <th class="px-6 py-3">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -128,19 +152,19 @@
                                         'other' => 'help',
                                     ];
                                 @endphp
-                                <span class="inline-flex items-center gap-1 text-sm capitalize">
+                                <span class="inline-flex items-center gap-1 text-sm">
                                     <span class="material-icons-outlined text-sm text-gray-400">{{ $typeIcons[$report->type] ?? 'help' }}</span>
-                                    {{ $report->type }}
+                                    {{ $typeTranslations[$report->type] ?? ucfirst($report->type) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="font-mono text-sm">{{ $report->subnet->cidr_notation ?? 'N/A' }}</span>
                                 @if($report->lease)
-                                    <span class="block text-xs text-gray-500">Lease #{{ $report->lease_id }}</span>
+                                    <span class="block text-xs text-gray-500">{{ __('Lease') }} #{{ $report->lease_id }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ $report->source ?? 'Unknown' }}
+                                {{ $report->source ?? __('Unknown') }}
                             </td>
                             <td class="px-6 py-4">
                                 @php
@@ -152,8 +176,8 @@
                                     ];
                                     $color = $severityColors[$report->severity] ?? 'gray';
                                 @endphp
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $color }}-100 text-{{ $color }}-800 capitalize">
-                                    {{ $report->severity }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $color }}-100 text-{{ $color }}-800">
+                                    {{ $severityTranslations[$report->severity] ?? ucfirst($report->severity) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
@@ -166,8 +190,8 @@
                                     ];
                                     $statusColor = $statusColors[$report->status] ?? 'gray';
                                 @endphp
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800 capitalize">
-                                    {{ $report->status }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800">
+                                    {{ $statusTranslations[$report->status] ?? ucfirst($report->status) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">
@@ -178,20 +202,20 @@
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('admin.security.abuse-reports.show', $report) }}"
                                        class="text-primary-600 hover:text-primary-800"
-                                       title="View Details">
+                                       title="{{ __('View Details') }}">
                                         <span class="material-icons-outlined text-xl">visibility</span>
                                     </a>
                                     @if($report->status === 'open' || $report->status === 'investigating')
                                         <button type="button"
                                                 onclick="openResolveModal({{ $report->id }})"
                                                 class="text-green-600 hover:text-green-800"
-                                                title="Resolve">
+                                                title="{{ __('Resolve') }}">
                                             <span class="material-icons-outlined text-xl">check_circle</span>
                                         </button>
                                         <button type="button"
                                                 onclick="openDismissModal({{ $report->id }})"
                                                 class="text-gray-600 hover:text-gray-800"
-                                                title="Dismiss">
+                                                title="{{ __('Dismiss') }}">
                                             <span class="material-icons-outlined text-xl">cancel</span>
                                         </button>
                                     @endif
@@ -202,7 +226,7 @@
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                 <span class="material-icons-outlined text-5xl text-gray-300 mb-4 block">inbox</span>
-                                No abuse reports found matching your criteria.
+                                {{ __('No abuse reports found matching your criteria.') }}
                             </td>
                         </tr>
                     @endforelse
@@ -220,24 +244,24 @@
     <!-- Resolve Modal -->
     <div id="resolve-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Resolve Abuse Report</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ __('Resolve Abuse Report') }}</h3>
             <form id="resolve-form" method="POST" action="">
                 @csrf
                 <div class="mb-4">
                     <label for="resolve-notes" class="block text-sm font-medium text-gray-700 mb-1">
-                        Resolution Notes <span class="text-red-500">*</span>
+                        {{ __('Resolution Notes') }} <span class="text-red-500">*</span>
                     </label>
                     <textarea id="resolve-notes" name="resolution_notes" rows="4" required minlength="10"
                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                              placeholder="Describe what actions were taken to resolve this issue..."></textarea>
+                              placeholder="{{ __('Describe what actions were taken to resolve this issue...') }}"></textarea>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeResolveModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
-                        Cancel
+                        {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                         <span class="material-icons-outlined text-sm mr-1">check</span>
-                        Resolve
+                        {{ __('Resolve') }}
                     </button>
                 </div>
             </form>
@@ -247,24 +271,24 @@
     <!-- Dismiss Modal -->
     <div id="dismiss-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Dismiss Abuse Report</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ __('Dismiss Abuse Report') }}</h3>
             <form id="dismiss-form" method="POST" action="">
                 @csrf
                 <div class="mb-4">
                     <label for="dismiss-notes" class="block text-sm font-medium text-gray-700 mb-1">
-                        Reason for Dismissal <span class="text-red-500">*</span>
+                        {{ __('Reason for Dismissal') }} <span class="text-red-500">*</span>
                     </label>
                     <textarea id="dismiss-notes" name="resolution_notes" rows="4" required minlength="10"
                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                              placeholder="Explain why this report is being dismissed..."></textarea>
+                              placeholder="{{ __('Explain why this report is being dismissed...') }}"></textarea>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeDismissModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
-                        Cancel
+                        {{ __('Cancel') }}
                     </button>
                     <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                         <span class="material-icons-outlined text-sm mr-1">cancel</span>
-                        Dismiss
+                        {{ __('Dismiss') }}
                     </button>
                 </div>
             </form>
