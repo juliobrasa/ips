@@ -12,6 +12,7 @@ use App\Http\Controllers\PayoutController;
 use App\Http\Controllers\LoaController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -36,6 +37,10 @@ Route::post('/verify-loa', [LoaController::class, 'verify'])->name('loa.verify')
 Route::get('/help', [HelpController::class, 'index'])->name('help.index');
 Route::get('/help/{slug}', [HelpController::class, 'show'])->name('help.show');
 
+// Two-Factor Authentication Challenge (before full auth)
+Route::get('/two-factor-challenge', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
+Route::post('/two-factor-challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -46,6 +51,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Two-Factor Authentication Management
+    Route::get('/two-factor', [TwoFactorController::class, 'index'])->name('two-factor.index');
+    Route::get('/two-factor/enable', [TwoFactorController::class, 'enable'])->name('two-factor.enable');
+    Route::post('/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+    Route::delete('/two-factor', [TwoFactorController::class, 'disable'])->name('two-factor.disable');
+    Route::post('/two-factor/regenerate-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('two-factor.regenerate-codes');
 
     // KYC Documents
     Route::get('/profile/kyc-documents', [App\Http\Controllers\KycDocumentController::class, 'index'])->name('kyc.documents');
@@ -159,6 +171,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/security/abuse-reports/{report}', [App\Http\Controllers\Admin\SecurityController::class, 'showAbuseReport'])->name('security.abuse-reports.show');
     Route::post('/security/abuse-reports/{report}/resolve', [App\Http\Controllers\Admin\SecurityController::class, 'resolveAbuseReport'])->name('security.abuse-reports.resolve');
     Route::post('/security/abuse-reports/{report}/dismiss', [App\Http\Controllers\Admin\SecurityController::class, 'dismissAbuseReport'])->name('security.abuse-reports.dismiss');
+
+    // IP Health Management
+    Route::get('/ip-health', [App\Http\Controllers\Admin\IpHealthController::class, 'index'])->name('ip-health.index');
+    Route::get('/ip-health/dashboard', [App\Http\Controllers\Admin\IpHealthController::class, 'dashboard'])->name('ip-health.dashboard');
+    Route::get('/ip-health/subnets-at-risk', [App\Http\Controllers\Admin\IpHealthController::class, 'subnetsAtRisk'])->name('ip-health.at-risk');
+    Route::post('/ip-health/schedule-check', [App\Http\Controllers\Admin\IpHealthController::class, 'scheduleCheck'])->name('ip-health.schedule-check');
+    Route::post('/ip-health/bulk-check', [App\Http\Controllers\Admin\IpHealthController::class, 'bulkCheck'])->name('ip-health.bulk-check');
+
+    // Blacklist Delisting Management
+    Route::get('/delisting', [App\Http\Controllers\Admin\DelistingController::class, 'index'])->name('delisting.index');
+    Route::get('/delisting/pending', [App\Http\Controllers\Admin\DelistingController::class, 'pending'])->name('delisting.pending');
+    Route::get('/delisting/{request}', [App\Http\Controllers\Admin\DelistingController::class, 'show'])->name('delisting.show');
+    Route::post('/delisting/{request}/check-status', [App\Http\Controllers\Admin\DelistingController::class, 'checkStatus'])->name('delisting.check-status');
+    Route::post('/delisting/{request}/mark-completed', [App\Http\Controllers\Admin\DelistingController::class, 'markCompleted'])->name('delisting.mark-completed');
+    Route::post('/delisting/request', [App\Http\Controllers\Admin\DelistingController::class, 'createRequest'])->name('delisting.request');
+
+    // Audit Logs
+    Route::get('/audit-logs', [App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/audit-logs/{log}', [App\Http\Controllers\Admin\AuditLogController::class, 'show'])->name('audit-logs.show');
 });
 
 require __DIR__.'/auth.php';
