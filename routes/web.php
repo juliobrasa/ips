@@ -13,6 +13,7 @@ use App\Http\Controllers\LoaController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\RipeController;
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -107,6 +108,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Payouts (for Holders)
     Route::get('/payouts', [PayoutController::class, 'index'])->name('payouts.index');
     Route::get('/payouts/{payout}', [PayoutController::class, 'show'])->name('payouts.show');
+
+    // RIPE Management
+    Route::prefix('ripe')->name('ripe.')->group(function () {
+        Route::get('/', [RipeController::class, 'index'])->name('index');
+        Route::get('/credentials', [RipeController::class, 'credentials'])->name('credentials');
+        Route::post('/credentials', [RipeController::class, 'storeCredential'])->name('credentials.store');
+        Route::delete('/credentials/{credential}', [RipeController::class, 'destroyCredential'])->name('credentials.destroy');
+
+        // Subnet RIPE management
+        Route::get('/subnet/{subnet}', [RipeController::class, 'subnetInfo'])->name('subnet.info');
+        Route::get('/subnet/{subnet}/edit', [RipeController::class, 'editSubnet'])->name('subnet.edit');
+        Route::put('/subnet/{subnet}', [RipeController::class, 'updateSubnet'])->name('subnet.update');
+        Route::post('/subnet/{subnet}/sync', [RipeController::class, 'syncSubnet'])->name('subnet.sync');
+        Route::get('/subnet/{subnet}/routes', [RipeController::class, 'routeObjects'])->name('subnet.routes');
+        Route::post('/subnet/{subnet}/routes', [RipeController::class, 'createRoute'])->name('subnet.routes.create');
+        Route::get('/subnet/{subnet}/geolocation', [RipeController::class, 'geolocation'])->name('subnet.geolocation');
+        Route::get('/subnet/{subnet}/routing', [RipeController::class, 'routing'])->name('subnet.routing');
+    });
 });
 
 // Admin routes
