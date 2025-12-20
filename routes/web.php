@@ -13,6 +13,13 @@ use App\Http\Controllers\LoaController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\RipeController;
+use App\Http\Controllers\ToolsController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\LookingGlassController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 // Language switcher
@@ -40,6 +47,12 @@ Route::get('/help/{slug}', [HelpController::class, 'show'])->name('help.show');
 // Two-Factor Authentication Challenge (before full auth)
 Route::get('/two-factor-challenge', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
 Route::post('/two-factor-challenge', [TwoFactorController::class, 'verify'])->name('two-factor.verify');
+
+// Referral registration tracking
+Route::get('/ref/{code}', [ReferralController::class, 'track'])->name('referrals.track');
+
+// Stripe Webhook (no CSRF)
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])->name('stripe.webhook')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -107,6 +120,79 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Payouts (for Holders)
     Route::get('/payouts', [PayoutController::class, 'index'])->name('payouts.index');
     Route::get('/payouts/{payout}', [PayoutController::class, 'show'])->name('payouts.show');
+
+    // RIPE Management
+    Route::prefix('ripe')->name('ripe.')->group(function () {
+        Route::get('/', [RipeController::class, 'index'])->name('index');
+        Route::get('/credentials', [RipeController::class, 'credentials'])->name('credentials');
+        Route::post('/credentials', [RipeController::class, 'storeCredential'])->name('credentials.store');
+        Route::delete('/credentials/{credential}', [RipeController::class, 'destroyCredential'])->name('credentials.destroy');
+
+        // Subnet RIPE management
+        Route::get('/subnet/{subnet}', [RipeController::class, 'subnetInfo'])->name('subnet.info');
+        Route::get('/subnet/{subnet}/edit', [RipeController::class, 'editSubnet'])->name('subnet.edit');
+        Route::put('/subnet/{subnet}', [RipeController::class, 'updateSubnet'])->name('subnet.update');
+        Route::post('/subnet/{subnet}/sync', [RipeController::class, 'syncSubnet'])->name('subnet.sync');
+        Route::get('/subnet/{subnet}/routes', [RipeController::class, 'routeObjects'])->name('subnet.routes');
+        Route::post('/subnet/{subnet}/routes', [RipeController::class, 'createRoute'])->name('subnet.routes.create');
+        Route::get('/subnet/{subnet}/geolocation', [RipeController::class, 'geolocation'])->name('subnet.geolocation');
+        Route::get('/subnet/{subnet}/routing', [RipeController::class, 'routing'])->name('subnet.routing');
+    });
+
+    // IP Tools
+    Route::prefix('tools')->name('tools.')->group(function () {
+        Route::get('/', [ToolsController::class, 'index'])->name('index');
+        Route::get('/subnet-calculator', [ToolsController::class, 'subnetCalculator'])->name('subnet-calculator');
+        Route::get('/split-subnet', [ToolsController::class, 'splitSubnet'])->name('split-subnet');
+        Route::get('/merge-subnets', [ToolsController::class, 'mergeSubnets'])->name('merge-subnets');
+        Route::get('/range-to-cidr', [ToolsController::class, 'rangeToCidr'])->name('range-to-cidr');
+        Route::get('/cidr-to-range', [ToolsController::class, 'cidrToRange'])->name('cidr-to-range');
+        Route::get('/ip-in-subnet', [ToolsController::class, 'ipInSubnet'])->name('ip-in-subnet');
+        Route::get('/ip-info', [ToolsController::class, 'ipInfo'])->name('ip-info');
+        Route::match(['get', 'post'], '/geofeed-generator', [ToolsController::class, 'geofeedGenerator'])->name('geofeed-generator');
+        Route::get('/subnets-summary', [ToolsController::class, 'subnetsSummary'])->name('subnets-summary');
+        Route::post('/validate-cidr', [ToolsController::class, 'validateCidr'])->name('validate-cidr');
+    });
+
+    // Looking Glass
+    Route::prefix('looking-glass')->name('tools.looking-glass.')->group(function () {
+        Route::get('/', [LookingGlassController::class, 'index'])->name('index');
+        Route::post('/query', [LookingGlassController::class, 'query'])->name('query');
+    });
+
+    // Support Tickets
+    Route::prefix('tickets')->name('tickets.')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('index');
+        Route::get('/create', [TicketController::class, 'create'])->name('create');
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{ticket}', [TicketController::class, 'show'])->name('show');
+        Route::post('/{ticket}/reply', [TicketController::class, 'reply'])->name('reply');
+        Route::post('/{ticket}/close', [TicketController::class, 'close'])->name('close');
+        Route::post('/{ticket}/reopen', [TicketController::class, 'reopen'])->name('reopen');
+    });
+
+    // Analytics
+    Route::prefix('analytics')->name('analytics.')->group(function () {
+        Route::get('/', [AnalyticsController::class, 'index'])->name('index');
+        Route::get('/export/{type}/{format}', [AnalyticsController::class, 'export'])->name('export');
+    });
+
+    // Referral Program
+    Route::prefix('referrals')->name('referrals.')->group(function () {
+        Route::get('/', [ReferralController::class, 'index'])->name('index');
+        Route::get('/earnings', [ReferralController::class, 'earnings'])->name('earnings');
+        Route::post('/request-payout', [ReferralController::class, 'requestPayout'])->name('request-payout');
+    });
+
+    // Payments
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('/methods', [PaymentController::class, 'methods'])->name('methods');
+        Route::post('/methods', [PaymentController::class, 'addMethod'])->name('methods.add');
+        Route::delete('/methods/{method}', [PaymentController::class, 'removeMethod'])->name('methods.remove');
+        Route::post('/methods/{method}/default', [PaymentController::class, 'setDefault'])->name('methods.default');
+        Route::get('/checkout/{invoice}', [PaymentController::class, 'checkout'])->name('checkout');
+        Route::post('/process/{invoice}', [PaymentController::class, 'process'])->name('process');
+    });
 });
 
 // Admin routes

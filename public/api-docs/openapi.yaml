@@ -1,0 +1,758 @@
+openapi: 3.0.3
+info:
+  title: IPS Marketplace API
+  description: |
+    REST API for the IP Subnet Marketplace platform.
+
+    ## Authentication
+    All API endpoints require authentication using Bearer tokens.
+    Include the token in the Authorization header: `Authorization: Bearer {token}`
+
+    ## Rate Limiting
+    API requests are limited to 60 requests per minute per user.
+
+    ## Errors
+    The API uses standard HTTP response codes and returns errors in JSON format.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@ipsmarketplace.com
+
+servers:
+  - url: /api/v1
+    description: Production API
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: API token obtained from user profile
+
+  schemas:
+    Subnet:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        cidr:
+          type: string
+          example: "192.168.1.0/24"
+        ip_version:
+          type: integer
+          enum: [4, 6]
+          example: 4
+        status:
+          type: string
+          enum: [available, leased, reserved, suspended]
+          example: available
+        rir:
+          type: string
+          enum: [RIPE, ARIN, APNIC, LACNIC, AFRINIC]
+          example: RIPE
+        country_code:
+          type: string
+          example: "NL"
+        monthly_price:
+          type: number
+          format: float
+          example: 50.00
+        reputation_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 95
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Lease:
+      type: object
+      properties:
+        id:
+          type: integer
+        subnet_id:
+          type: integer
+        user_id:
+          type: integer
+        status:
+          type: string
+          enum: [active, expired, terminated, pending]
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        monthly_price:
+          type: number
+          format: float
+        auto_renew:
+          type: boolean
+        assigned_asn:
+          type: integer
+          nullable: true
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        invoice_number:
+          type: string
+        user_id:
+          type: integer
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+          example: EUR
+        status:
+          type: string
+          enum: [pending, paid, overdue, cancelled]
+        due_date:
+          type: string
+          format: date
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    SupportTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+        ticket_number:
+          type: string
+        subject:
+          type: string
+        category:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        status:
+          type: string
+          enum: [open, in_progress, waiting_customer, resolved, closed]
+        created_at:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+
+security:
+  - bearerAuth: []
+
+paths:
+  /subnets:
+    get:
+      summary: List subnets
+      tags: [Subnets]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [available, leased, all]
+        - name: ip_version
+          in: query
+          schema:
+            type: integer
+            enum: [4, 6]
+        - name: min_prefix
+          in: query
+          schema:
+            type: integer
+        - name: max_prefix
+          in: query
+          schema:
+            type: integer
+        - name: country
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 15
+      responses:
+        '200':
+          description: List of subnets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subnet'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+    post:
+      summary: Create a new subnet
+      tags: [Subnets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cidr]
+              properties:
+                cidr:
+                  type: string
+                  example: "192.168.1.0/24"
+                rir:
+                  type: string
+                  enum: [RIPE, ARIN, APNIC, LACNIC, AFRINIC]
+                country_code:
+                  type: string
+                monthly_price:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Subnet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subnet'
+        '422':
+          description: Validation error
+
+  /subnets/{id}:
+    get:
+      summary: Get subnet details
+      tags: [Subnets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Subnet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subnet'
+        '404':
+          description: Subnet not found
+
+    put:
+      summary: Update subnet
+      tags: [Subnets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                monthly_price:
+                  type: number
+                description:
+                  type: string
+                country_code:
+                  type: string
+      responses:
+        '200':
+          description: Subnet updated
+        '404':
+          description: Subnet not found
+
+    delete:
+      summary: Delete subnet
+      tags: [Subnets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Subnet deleted
+        '404':
+          description: Subnet not found
+
+  /subnets/{id}/verify:
+    post:
+      summary: Request subnet verification
+      tags: [Subnets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Verification initiated
+        '400':
+          description: Already verified or pending
+
+  /subnets/{id}/reputation:
+    get:
+      summary: Get subnet reputation score
+      tags: [Subnets]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reputation data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  score:
+                    type: integer
+                  grade:
+                    type: string
+                  issues:
+                    type: array
+                    items:
+                      type: string
+                  checked_at:
+                    type: string
+                    format: date-time
+
+  /leases:
+    get:
+      summary: List user's leases
+      tags: [Leases]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, expired, all]
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of leases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Lease'
+
+  /leases/{id}:
+    get:
+      summary: Get lease details
+      tags: [Leases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lease details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lease'
+
+  /leases/{id}/renew:
+    post:
+      summary: Renew a lease
+      tags: [Leases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                months:
+                  type: integer
+                  default: 1
+                  minimum: 1
+                  maximum: 12
+      responses:
+        '200':
+          description: Lease renewed
+        '400':
+          description: Cannot renew
+
+  /leases/{id}/terminate:
+    post:
+      summary: Terminate a lease
+      tags: [Leases]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lease terminated
+        '400':
+          description: Cannot terminate
+
+  /invoices:
+    get:
+      summary: List invoices
+      tags: [Invoices]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, overdue, all]
+      responses:
+        '200':
+          description: List of invoices
+
+  /invoices/{id}:
+    get:
+      summary: Get invoice details
+      tags: [Invoices]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+
+  /invoices/{id}/pay:
+    post:
+      summary: Pay an invoice
+      tags: [Invoices]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payment_method_id:
+                  type: string
+      responses:
+        '200':
+          description: Payment successful
+        '400':
+          description: Payment failed
+
+  /tickets:
+    get:
+      summary: List support tickets
+      tags: [Support]
+      responses:
+        '200':
+          description: List of tickets
+    post:
+      summary: Create support ticket
+      tags: [Support]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject, category, message]
+              properties:
+                subject:
+                  type: string
+                category:
+                  type: string
+                priority:
+                  type: string
+                  enum: [low, medium, high, urgent]
+                message:
+                  type: string
+      responses:
+        '201':
+          description: Ticket created
+
+  /tickets/{id}:
+    get:
+      summary: Get ticket details
+      tags: [Support]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ticket details
+
+  /tickets/{id}/reply:
+    post:
+      summary: Reply to ticket
+      tags: [Support]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Reply added
+
+  /tools/subnet-calculator:
+    get:
+      summary: Calculate subnet information
+      tags: [Tools]
+      parameters:
+        - name: cidr
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subnet calculation results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  network:
+                    type: string
+                  broadcast:
+                    type: string
+                  netmask:
+                    type: string
+                  wildcard:
+                    type: string
+                  first_host:
+                    type: string
+                  last_host:
+                    type: string
+                  total_hosts:
+                    type: integer
+
+  /tools/validate-cidr:
+    post:
+      summary: Validate CIDR notation
+      tags: [Tools]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cidr:
+                  type: string
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+  /looking-glass/query:
+    post:
+      summary: Query BGP routing information
+      tags: [Tools]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resource]
+              properties:
+                resource:
+                  type: string
+                  description: IP prefix or ASN
+      responses:
+        '200':
+          description: BGP query results
+
+  /ripe/subnet/{id}/whois:
+    get:
+      summary: Get WHOIS data for subnet
+      tags: [RIPE]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: WHOIS data
+
+  /ripe/subnet/{id}/rpki:
+    get:
+      summary: Get RPKI status for subnet
+      tags: [RIPE]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: RPKI validation status
+
+  /analytics/summary:
+    get:
+      summary: Get analytics summary
+      tags: [Analytics]
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subnets:
+                    type: object
+                  leases:
+                    type: object
+                  revenue:
+                    type: object
+
+  /referrals:
+    get:
+      summary: Get referral information
+      tags: [Referrals]
+      responses:
+        '200':
+          description: Referral stats and link
+
+  /user/profile:
+    get:
+      summary: Get current user profile
+      tags: [User]
+      responses:
+        '200':
+          description: User profile data
+    put:
+      summary: Update user profile
+      tags: [User]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                preferred_currency:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+
+tags:
+  - name: Subnets
+    description: IP subnet management
+  - name: Leases
+    description: Subnet lease operations
+  - name: Invoices
+    description: Invoice and payment management
+  - name: Support
+    description: Support ticket system
+  - name: Tools
+    description: IP tools and utilities
+  - name: RIPE
+    description: RIPE NCC integration
+  - name: Analytics
+    description: Analytics and reporting
+  - name: Referrals
+    description: Referral program
+  - name: User
+    description: User profile management

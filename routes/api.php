@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AbuseReportController;
 use App\Http\Controllers\Api\V1\ReputationController;
 use App\Http\Controllers\Api\V1\MarketplaceController;
 use App\Http\Controllers\Api\V1\BlacklistController;
+use App\Http\Controllers\Api\V1\RipeApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,6 +68,29 @@ Route::prefix('v1')->group(function () {
         Route::post('/blacklists/request-delisting', [BlacklistController::class, 'requestDelisting']);
         Route::get('/blacklists/delisting-requests', [BlacklistController::class, 'listRequests']);
         Route::get('/blacklists/delisting-requests/{request}', [BlacklistController::class, 'showRequest']);
+
+        // RIPE Integration
+        Route::prefix('ripe')->group(function () {
+            // RIPEstat Data API
+            Route::get('/info', [RipeApiController::class, 'getInfo']);
+            Route::get('/geolocation', [RipeApiController::class, 'getGeolocation']);
+            Route::get('/abuse-contact', [RipeApiController::class, 'getAbuseContact']);
+            Route::get('/whois', [RipeApiController::class, 'getWhois']);
+            Route::get('/routing-status', [RipeApiController::class, 'getRoutingStatus']);
+            Route::get('/bgp-state', [RipeApiController::class, 'getBgpState']);
+            Route::get('/asn/{asn}/prefixes', [RipeApiController::class, 'getAnnouncedPrefixes']);
+            Route::get('/asn/{asn}/overview', [RipeApiController::class, 'getAsOverview']);
+            Route::get('/endpoints', [RipeApiController::class, 'listEndpoints']);
+
+            // RIPE Database API
+            Route::get('/database/object', [RipeApiController::class, 'getDatabaseObject']);
+            Route::get('/database/search', [RipeApiController::class, 'searchDatabase']);
+
+            // Subnet-specific RIPE operations
+            Route::put('/subnets/{subnet}/inetnum', [RipeApiController::class, 'updateInetnum']);
+            Route::post('/subnets/{subnet}/route', [RipeApiController::class, 'createRoute']);
+            Route::get('/subnets/{subnet}/routes', [RipeApiController::class, 'getRoutes']);
+        });
 
         // Admin routes
         Route::middleware('admin')->prefix('admin')->group(function () {
